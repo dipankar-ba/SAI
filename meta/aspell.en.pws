@@ -18,6 +18,7 @@ InPktsDelayed
 InPktsLate
 InSegment
 Inservice
+IPsec
 LAGs
 Linux
 Loopback

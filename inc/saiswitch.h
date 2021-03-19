@@ -2122,6 +2122,28 @@ typedef enum _sai_switch_attr_t
     SAI_SWITCH_ATTR_MACSEC_OBJECT_ID,
 
     /**
+     * @brief IPsec object for this switch.
+     *
+     * @type sai_object_id_t
+     * @flags CREATE_AND_SET
+     * @objects SAI_OBJECT_TYPE_IPSEC
+     * @allownull true
+     * @default SAI_NULL_OBJECT_ID
+     */
+    SAI_SWITCH_ATTR_IPSEC_OBJECT_ID,
+
+    /**
+     * @brief TPID in IPsec SA-Tag.  This is used only between a Switch ASIC
+     * and IPsec-enabled PHY chips and not packets on extrenal network.
+     *
+     * @type sai_uint16_t
+     * @flags CREATE_AND_SET
+     * @isvlan false
+     * @default 0x1234
+     */
+    SAI_SWITCH_ATTR_IPSEC_SA_TAG_TPID,
+
+    /**
      * @brief Enable EXP -> TC MAP on switch.
      *
      * MAP id = #SAI_NULL_OBJECT_ID to disable map on switch.

@@ -945,6 +945,15 @@ typedef enum _sai_port_attr_t
     SAI_PORT_ATTR_MACSEC_PORT_LIST,
 
     /**
+     * @brief Associated IPsec port
+     *
+     * @type sai_object_id_t
+     * @flags READ_ONLY
+     * @objects SAI_OBJECT_TYPE_IPSEC_PORT
+     */
+    SAI_PORT_ATTR_IPSEC_PORT,
+
+    /**
      * @brief Enable/Disable Mirror session
      *
      * Enable ingress mirroring by assigning list of mirror session object id

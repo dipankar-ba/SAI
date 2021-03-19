@@ -36,6 +36,7 @@ ECN - Explicit Congestion Notification
 ECT - ECN Capable Transport
 EEE - Electrical and Electronics Engineering
 ERSPAN - Encapsulated Remote SPAN
+ESN - Extended Sequence Number
 FCS - Frame Check Sequence
 FD - File Descriptor
 FDB - Forwarding Data Base
@@ -58,9 +59,9 @@ IGMP - Internet Group Management Protocol
 IHL - Internet Header Length
 IOAM - In-situ Operations And Management
 IP - Internet Protocol
+IP2ME - IP packets to local router IP
 IPG - Inter-Packet Gap
 IPFIX - IP Flow Information Export
-IP2ME - IP packets to local router IP
 IPMC - Intelligent Platform Management Controller
 L2 - Layer 2
 L2MC - Layer 2 Multi Cast
@@ -105,6 +106,7 @@ SNAT - Source Network Address Translation
 SNMP - Simple Network Management Protocol
 SNR - Signal to Noise Ratio
 SPAN - Switched Port Analyzer
+SPI - Security Parameter Index
 SQE - Signal Quality Errors
 SSCI - Short Secure Channel Identifier
 SSH - Secure Shell
@@ -113,6 +115,7 @@ STP - Spanning Tree Protocol
 TC - Traffic Control
 TCAM - Ternary Content Addressable Memory
 TCP - Transmission Control Protocol
+TEK - Traffic Encryption Key
 TLS - Transport Layer Security
 TOS - Type Of Service
 TPID - Tag Protocol Identifier
