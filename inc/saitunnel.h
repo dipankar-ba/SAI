@@ -654,9 +654,14 @@ typedef enum _sai_tunnel_attr_t
 
     /**
      * @brief List of ports that are programmed with SAs for this IPsec tunnel.
+     * Useful only when IPsec is implemented in a PHY Chip (different sai_switch
+     * object).
      *
+     * For IPsec hardware in the Switch ASIC, the per-tunnel port list can be
+     * derived from the union of SAI_IPSEC_SA_ATTR_IPSEC_PORT_LIST for all sai
+     *_ipsec_sa objects for that tunnel.
      * @type sai_object_list_t
-     * @flags READ_ONLY
+     * @flags CREATE_AND_SET
      * @objects SAI_OBJECT_TYPE_PORT
      */
     SAI_TUNNEL_ATTR_IPSEC_SA_PORT_LIST,
