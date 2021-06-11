@@ -392,50 +392,6 @@ typedef enum _sai_tunnel_dscp_mode_t
 } sai_tunnel_dscp_mode_t;
 
 /**
- * @brief Defines tunnel encap ECN mode
- */
-typedef enum _sai_tunnel_encap_ecn_mode_t
-{
-    /**
-     * @brief Normal mode behavior defined in RFC 6040
-     * section 4.1 copy from inner
-     */
-    SAI_TUNNEL_ENCAP_ECN_MODE_STANDARD,
-
-    /**
-     * @brief User defined behavior.
-     *
-     * Need to provide #SAI_TUNNEL_MAP_TYPE_OECN_TO_UECN in #SAI_TUNNEL_ATTR_ENCAP_MAPPERS.
-     */
-    SAI_TUNNEL_ENCAP_ECN_MODE_USER_DEFINED
-
-} sai_tunnel_encap_ecn_mode_t;
-
-/**
- * @brief Defines tunnel decap ECN mode
- */
-typedef enum _sai_tunnel_decap_ecn_mode_t
-{
-    /**
-     * @brief Behavior defined in RFC 6040 section 4.2
-     */
-    SAI_TUNNEL_DECAP_ECN_MODE_STANDARD,
-
-    /**
-     * @brief Copy from outer ECN
-     */
-    SAI_TUNNEL_DECAP_ECN_MODE_COPY_FROM_OUTER,
-
-    /**
-     * @brief User defined behavior
-     *
-     * Need to provide #SAI_TUNNEL_MAP_TYPE_UECN_OECN_TO_OECN in #SAI_TUNNEL_ATTR_DECAP_MAPPERS
-     */
-    SAI_TUNNEL_DECAP_ECN_MODE_USER_DEFINED
-
-} sai_tunnel_decap_ecn_mode_t;
-
-/**
  * @brief Defines tunnel peer mode
  */
 typedef enum _sai_tunnel_peer_mode_t
@@ -681,8 +637,43 @@ typedef enum _sai_tunnel_attr_t
      * @type sai_packet_action_t
      * @flags CREATE_AND_SET
      * @default SAI_PACKET_ACTION_FORWARD
+     * @isresourcetype true
      */
     SAI_TUNNEL_ATTR_LOOPBACK_PACKET_ACTION,
+
+    /**
+     * @brief Tunnel VXLAN UDP source port mode
+     *
+     * @type sai_tunnel_vxlan_udp_sport_mode_t
+     * @flags CREATE_AND_SET
+     * @default SAI_TUNNEL_VXLAN_UDP_SPORT_MODE_EPHEMERAL
+     */
+    SAI_TUNNEL_ATTR_VXLAN_UDP_SPORT_MODE,
+
+    /**
+     * @brief Tunnel UDP source port
+     *
+     * @type sai_uint16_t
+     * @flags CREATE_AND_SET
+     * @isvlan false
+     * @default 0
+     * @validonly SAI_TUNNEL_ATTR_TYPE == SAI_TUNNEL_TYPE_VXLAN and SAI_TUNNEL_ATTR_VXLAN_UDP_SPORT_MODE == SAI_TUNNEL_VXLAN_UDP_SPORT_MODE_USER_DEFINED
+     */
+    SAI_TUNNEL_ATTR_VXLAN_UDP_SPORT,
+
+    /**
+     * @brief Tunnel UDP source port mask
+     *
+     * Sport mask defining the number of least significant bits
+     * reserved for the calculated hash value. 0 means a fixed value.
+     *
+     * @type sai_uint8_t
+     * @flags CREATE_AND_SET
+     * @isvlan false
+     * @default 0
+     * @validonly SAI_TUNNEL_ATTR_TYPE == SAI_TUNNEL_TYPE_VXLAN and SAI_TUNNEL_ATTR_VXLAN_UDP_SPORT_MODE == SAI_TUNNEL_VXLAN_UDP_SPORT_MODE_USER_DEFINED
+     */
+    SAI_TUNNEL_ATTR_VXLAN_UDP_SPORT_MASK,
 
     /**
      * @brief End of attributes

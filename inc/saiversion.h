@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2018 Microsoft Open Technologies, Inc.
+ * Copyright (c) 2014 Microsoft Open Technologies, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License"); you may
  *    not use this file except in compliance with the License. You may obtain
@@ -17,38 +17,20 @@
  *    assistance with these files: Intel Corporation, Mellanox Technologies Ltd,
  *    Dell Products, L.P., Facebook, Inc., Marvell International Ltd.
  *
- * @file    saiextensions.h
+ * @file    saiversion.h
  *
- * @brief   This module defines extensions of the Switch Abstraction Interface (SAI)
+ * @brief   Define the current version
  */
 
-#ifndef __SAIEXTENSIONS_H_
-#define __SAIEXTENSIONS_H_
+#if !defined (__SAIVERSION_H_)
+#define __SAIVERSION_H_
 
-#include <saitypes.h>
+#define SAI_MAJOR 1
+#define SAI_MINOR 8
+#define SAI_REVISION 1
 
-/* existing enum extensions */
-#include "saitypesextensions.h"
-#include "saiswitchextensions.h"
+#define SAI_VERSION(major, minor, revision) (10000 * (major) + 100 * (minor) + (revision))
 
-/* new experimental object type includes */
-#include "saiexperimentalbmtor.h"
+#define SAI_API_VERSION SAI_VERSION(SAI_MAJOR, SAI_MINOR, SAI_REVISION)
 
-/**
- * @brief Extensions to SAI APIs
- *
- * @flags
- */
-typedef enum _sai_api_extensions_t
-{
-    SAI_API_EXTENSIONS_RANGE_START = SAI_API_MAX,
-
-    SAI_API_BMTOR = SAI_API_EXTENSIONS_RANGE_START,
-
-    /* Add new experimental APIs above this line */
-
-    SAI_API_EXTENSIONS_RANGE_END
-
-} sai_api_extensions_t;
-
-#endif /* __SAIEXTENSIONS_H_ */
+#endif /** __SAIVERSION_H_ */

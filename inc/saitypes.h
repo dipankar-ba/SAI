@@ -277,9 +277,10 @@ typedef enum _sai_object_type_t
     SAI_OBJECT_TYPE_MACSEC_SA                = 92,
     SAI_OBJECT_TYPE_SYSTEM_PORT              = 93,
     SAI_OBJECT_TYPE_FINE_GRAINED_HASH_FIELD  = 94,
-    SAI_OBJECT_TYPE_IPSEC                    = 95,
-    SAI_OBJECT_TYPE_IPSEC_PORT               = 96,
-    SAI_OBJECT_TYPE_IPSEC_SA                 = 97,
+    SAI_OBJECT_TYPE_SWITCH_TUNNEL            = 95,
+    SAI_OBJECT_TYPE_IPSEC                    = 96,
+    SAI_OBJECT_TYPE_IPSEC_PORT               = 97,
+    SAI_OBJECT_TYPE_IPSEC_SA                 = 98,
     SAI_OBJECT_TYPE_MAX,  /* Must remain in last position */
 } sai_object_type_t;
 
@@ -393,6 +394,32 @@ typedef struct _sai_ip_prefix_t
     /** @passparam addr_family */
     sai_ip_addr_t mask;
 } sai_ip_prefix_t;
+
+/**
+ * @brief Attribute data for #SAI_PORT_ATTR_PRBS_RX_STATUS
+ */
+typedef enum _sai_port_prbs_rx_status_t
+{
+    /** PRBS is locked and error_count is 0 */
+    SAI_PORT_PRBS_RX_STATUS_OK,
+
+    /** PRBS is locked, but there are errors */
+    SAI_PORT_PRBS_RX_STATUS_LOCK_WITH_ERRORS,
+
+    /** PRBS not locked */
+    SAI_PORT_PRBS_RX_STATUS_NOT_LOCKED,
+
+    /** PRBS locked but there is loss of lock since last call */
+    SAI_PORT_PRBS_RX_STATUS_LOST_LOCK,
+
+} sai_port_prbs_rx_status_t;
+
+typedef struct _sai_prbs_rx_state_t
+{
+    sai_port_prbs_rx_status_t rx_status;
+
+    uint32_t error_count;
+} sai_prbs_rx_state_t;
 
 /**
  * @brief Field match mask
@@ -744,6 +771,9 @@ typedef enum _sai_acl_stage_t
 
     /** Egress Stage */
     SAI_ACL_STAGE_EGRESS_MACSEC,
+
+    /** Pre-ingress Stage */
+    SAI_ACL_STAGE_PRE_INGRESS,
 
 } sai_acl_stage_t;
 
@@ -1141,6 +1171,9 @@ typedef union _sai_attribute_value_t
 
     /** @validonly meta->attrvaluetype == SAI_ATTR_VALUE_TYPE_IP_PREFIX */
     sai_ip_prefix_t ipprefix;
+
+    /** @validonly meta->attrvaluetype == SAI_ATTR_VALUE_TYPE_PRBS_RX_STATE */
+    sai_prbs_rx_state_t rx_state;
 
     /** @validonly meta->attrvaluetype == SAI_ATTR_VALUE_TYPE_OBJECT_ID */
     sai_object_id_t oid;
