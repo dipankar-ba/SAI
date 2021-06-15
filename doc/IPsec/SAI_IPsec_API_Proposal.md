@@ -36,17 +36,15 @@ Packet security includes confidentiality, integrity and authenticity protection.
       1. Removing the tunnel header
       1. Switching the tunnel payload based on the inner packet
 
-Since a Switch ASIC typically performs tunnel termination based only on packet headers, it cannot make use of the Next Header field in the ESP trailer.  So it parses the decrypted payload based on the value of its first nibble as shown in the table below.  This requires the tunnel originator to set to 0 the first nibble of Source Port of the UDP header for VXLAN.
-
-First decrypted nibble | Payload format
------------------------|----------------------
-0                      | Encrypted payload of VXLAN_UDP_ESP format
-4	               | IPv4
-6	               | IPv6
-------------------------------
 The tunnel origination and termination functions are performed in the Packet Processor inside the Switch ASIC.  The packet security functions are performed by Security Engines that process packets going between the Packet Processor and the external ports of the Network Switch.
   
 ![Fig-2](figures/ipsecFig2.png)
+
+Since the Packet Processor typically performs tunnel termination based only on packet headers, it cannot make use of the Next Header field in the ESP trailer.  To get around this problem, the Packet Processor may make use of a per-SA parsing configuration.  Each SA is configured to have decrypted payload start with one of the following 2 types of header:
+1. IP header used for IPINIP, where IPv4 and IPv6 are distinguished by first nibble of the header
+2. UDP header (used for VXLAN_UDP_ESP)
+
+For IPsec to be terminated in such a Packet Processor, these 2 types of encrypted payload cannot share the same SA.
 
 In the SAI model, a Network Switch may be composed of a Switch ASIC and multiple PHY Chips, each of which is a separate sai_switch object.  A PHY Chip connects network ports to Switch ASIC ports.  Some network ports may not require a PHY Chip and may be directly connected to Switch ASIC ports.  Each PHY Chip may support a subset of the remaining Switch ASIC ports.  These Switch ASIC ports are connected to network ports through PHY Chip(s).
 
@@ -61,7 +59,7 @@ For each network port, a Security Engine can normally perform either IPsec or MA
 
 An integer object named sa_index carried in the packet metadata header associates a tunnel in the Packet Processor with a SA in the Security Engine.  The sa_index value is carried in packet metadata between the Packet Processor and the Security Engine.
 
-In case of Security Engines embedded in the Switch ASIC (as in Fig-2), the format of this metadata is implementation-specific.  In case of Security Engines embedded  in PHY Chips, this is carried in the SA-Tag right after the underlay Ethernet header, as shown in Fig-4.
+In case of Security Engine(s) embedded in the Switch ASIC (as in Fig-2), the format of this metadata is implementation-specific.  In case of Security Engine(s) embedded  in a PHY Chip, this is carried in the SA-Tag right after the underlay Ethernet header, as shown in Fig-4.
   
 ![Fig-4](figures/ipsecFig4.png)
 
@@ -69,7 +67,9 @@ The SA-Tag format is similar to 802.1Q tag and is distinguished by a reserved TP
   
 ![Fig-5](figures/ipsecFig5.png)
 
-Each Security Engine maintains SA (Security Association) states to secure packets.  For egress, the SA is selected by the sa_index coming from the Packet Processor with the packet.  Some important SA states are the encryption key, the SPI (Security Parameter Index) and the 64-bit IV (Initialization Vector).  For ingress the SA is selected by the SPI value in the encrypted packet header.
+Each Security Engine maintains SA (Security Association) states to secure packets.  For egress, the SA is selected by the sa_index coming from the Packet Processor with the packet.  Some important SA states are the encryption key, the SPI (Security Parameter Index) and the 64-bit IV (Initialization Vector).  For ingress, the SA is selected by the SPI value in the encrypted packet header.  The Security Engine only decrypts IPsec packets where the outer IP header and and the SPI match the valid SA.  All other packets are passed unmodified to the Packet Processor.  For IPsec packets that are not decrypted by the Security Engine, the Packet Processor can be programmed to:
+1. Send such packets to software for decryption
+1. Drop and count such packets using ACL rules
 
 The network ports used for IPsec are constrained by the following:
 1. Each Security Engine services a subset of network ports.
@@ -86,8 +86,8 @@ Overlay ECMP          | No constraint for overlay ECMP over multiple tunnels.  E
 # Object Relationships #
 
 IPsec makes use of:
-1. saitunnel.h for tunnel definition
-1. saiipsec.h for securing the packet
+1. saitunnel.h for tunnel definition.  This would be used only in teh Switch ASIC.
+1. saiipsec.h for securing the packet.  This would be used in the sai_switch object that implements the Security Engine, which could either be a Switch ASIC or a Phy Chip.
 
 
 ## saitunnel.h changes for IPsec support ##
@@ -110,18 +110,25 @@ This supports the following objects types:
 
 
 Each (line-side) sai_port that supports IPsec encryption/decryption, has an associated sai_ipsec_port object.
+A sai_port object is created for each:
+1. IPsec-capable port of the Switch ASIC, in case of Security Engine(s) embedded in the Switch ASIC
+1. IPsec-capable Line-side port of the Phy Chip, in case of Security Engine(s) embedded in the Phy Chip.
 
 
-Each IPsec tunnel has 2 active ipsec_sa, one for ingress and one for egress.  For each direction (ingress or egress), a new ispec_sa replaces the old one.  The sa_index of the tunnel is changed to switch from the old egress SA to the new one.  After a new ingress_sa is created, both the old and new SA can be active at the same time, selected by SPI in the received packets.
+Each IPsec tunnel has 2 active ipsec_sa, one for ingress and one for egress.  For rekeying, a new ipsec_sa replaces the old one.  For egress rekeying, the sa_index of the tunnel is changed to switch from the old SA to the new one.  For ingress rekeying, after a new SA is created, both the old and new SA are active, selected by SPI in the received packets.  After a period, the old SA is removed.
 
 ![Fig-6](figures/ipsecFig6.png)
 
 # Function call sequences #
-The following sequences assume that sai_tunnel, sai_ipsec and sai_ipsec_port  objects have already been created.
+The following sequences assume:
+1. sai_tunnel, sai_ipsec and sai_ipsec_port  objects have already been created.
+1. The Security Engine is in the PHY Chip.
+
+In case of Security Engine(s) embedded in the Switch ASIC, the PHY Chip referneces below should be replaced by Switch ASIC references.
 
 ## Create an egress SA and attach its index to a tunnel ##
 ~~~cpp
-// Create egress ipsec_sa
+// Create egress ipsec_sa for a PHY chip
 sai_object_id_t ingr_ipsec_sa_id11 = 0ULL;
 ipsec_attr_list[0].id = SAI_IPSEC_SA_ATTR_IPSEC_DIRECTION;
 ipsec_attr_list[0].value.s32 = SAI_IPSEC_DIRECTION_EGRESS;
@@ -129,10 +136,8 @@ ipsec_attr_list[0].value.s32 = SAI_IPSEC_DIRECTION_EGRESS;
 ipsec_attr_list[1].id = SAI_IPSEC_SA_ATTR_IPSEC_ID;
 ipsec_attr_list[1].value.oid = ipsec_id1;
 
-
 ipsec_attr_list[2].id = SAI_IPSEC_SA_ATTR_IPSEC_SPI;
 ipsec_attr_list[2].value.u32 = egr_ipsec_spi1;
-
 
 ipsec_attr_list[3].id = SAI_IPSEC_SA_ATTR_IPSEC_ENCRYPTION_KEY;
 ipsec_attr_list[3].value.macsecsak = egr_ipsec_encryption_key1;
@@ -143,7 +148,6 @@ ipsec_attr_list[4].value.u32 = egr_ipsec_salt1;
 ipsec_attr_list[5].id = SAI_IPSEC_SA_ATTR_IPSEC_AUTH_KEY;
 ipsec_attr_list[5].value.macsecauthkey = egr_ipsec_auth_key1;
 
-
 ipsec_attr_list[6].id = SAI_IPSEC_SA_ATTR_IPSEC_PORT_LIST;
 ipsec_attr_list[6].value.objlist = egr_ipsec_port_list1;
  
@@ -153,17 +157,18 @@ if (saistatus != SAI_STATUS_SUCCESS) {
     return saistatus;
 }
 
-
-// Get sa_index and assign it to the corresponding tunnel
+// Get sa_index from PHY Chip
 ipsec_attr_list[0].id = SAI_IPSEC_SA_ATTR_SA_INDEX;
 saistatus = sai_ipsec_api->get_ipsec_sa_attribute(&egr_ipsec_sa_id11,
 1, &ipsec_attr_list);
 if (saistatus != SAI_STATUS_SUCCESS) {
     return saistatus;
 }
-tunnel_attr.id = SAI_TUNNEL_ATTR_SA_INDEX;
-tunnel_attr.value = ipsec_attr_list[0].value;
+sa_index = ipsec_attr_list[0].value;
 
+// Assign sa_index to corresponding tunnel in Switch ASIC
+tunnel_attr.id = SAI_TUNNEL_ATTR_SA_INDEX;
+tunnel_attr.value = sa_index;
 
 saistatus = sai_tunnel_api->set_tunnel_sa_attribute(&tunnel_id11,
 &tunnel_attr);
@@ -174,7 +179,7 @@ if (saistatus != SAI_STATUS_SUCCESS) {
 
 ## Create an ingress SA ##
 ~~~cpp
-// Create ingress ipsec_sa
+// Create ingress ipsec_sa in PHY Chip
 sai_object_id_t ingr_ipsec_sa_id11 = 0ULL;
 ipsec_attr_list[0].id = SAI_IPSEC_SA_ATTR_IPSEC_DIRECTION;
 ipsec_attr_list[0].value.s32 = SAI_IPSEC_DIRECTION_INGRESS;  // different from egress
@@ -185,7 +190,6 @@ ipsec_attr_list[1].value.oid = ingr_ipsec_id1;
 ipsec_attr_list[2].id = SAI_IPSEC_SA_ATTR_IPSEC_SPI;
 ipsec_attr_list[2].value.u32 = ingr_ipsec_spi1;
 
-
 ipsec_attr_list[3].id = SAI_IPSEC_SA_ATTR_IPSEC_ENCRYPTION_KEY;
 ipsec_attr_list[3].value.macsecsak = ingr_ipsec_encryption_key1;
  
@@ -194,7 +198,6 @@ ipsec_attr_list[4].value.u32 = ingr_ipsec_salt1;
  
 ipsec_attr_list[5].id = SAI_IPSEC_SA_ATTR_IPSEC_AUTH_KEY;
 ipsec_attr_list[5].value.macsecauthkey = ingr_ipsec_auth_key1;
-
 
 ipsec_attr_list[6].id = SAI_IPSEC_SA_ATTR_TERM_DST_IP;          // only for ingress SA
 ipsec_attr_list[6].value.ipaddr = ipsec_term_dst_ip1;
@@ -213,7 +216,7 @@ if (saistatus != SAI_STATUS_SUCCESS) {
 
 The steps are identical for ingress and egress.  The following example is for egress.
 ~~~cpp
-// Collect last statistics for SA
+// Collect last statistics for SA from PHY Chip
 saistatus = sai_ipsec_api->get_ipsec_sa_stats_ext(&egr_ipsec_sa_id11,
 SA_STATS_COUNT, &ipsec_counter_list, SAI_IPSEC_ATTR_STATS_MODE);
 if (saistatus != SAI_STATUS_SUCCESS) {
@@ -222,7 +225,7 @@ if (saistatus != SAI_STATUS_SUCCESS) {
 
 UPDATE_EGRESS_SA_STATISTICS(ipsec_counter_list);
 
-// Remove old SA
+// Remove old SA from PHY Chip
 saistatus = sai_ipsec_api->remove_ipsec_sa(&egr_ipsec_sa_id11);
 if (saistatus != SAI_STATUS_SUCCESS) {
     return saistatus;

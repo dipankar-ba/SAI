@@ -1758,6 +1758,20 @@ typedef enum _sai_switch_attr_t
     SAI_SWITCH_ATTR_PORT_STATE_CHANGE_NOTIFY,
 
     /**
+     * @brief IPsec SA state change notification callback function.
+     *
+     * In case driver does not support this attribute, The Host adapter should poll
+     * port status by SAI_IPSEC_SA_ATTR_SN_STATUS.
+     *
+     * Use sai_ipsec_sa_state_notification_fn as notification function.
+     *
+     * @type sai_pointer_t sai_ipsec_sa_state_notification_fn
+     * @flags CREATE_AND_SET
+     * @default NULL
+     */
+    SAI_SWITCH_ATTR_IPSEC_SA_STATE_NOTIFY,
+
+    /**
      * @brief Received packet event notification callback function passed to the adapter.
      *
      * Use sai_packet_event_notification_fn as notification function.
