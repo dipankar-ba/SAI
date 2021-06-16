@@ -311,27 +311,6 @@ typedef sai_status_t (*sai_get_tunnel_map_attribute_fn)(
         _Inout_ sai_attribute_t *attr_list);
 
 /**
- * @brief Defines tunnel type
- */
-typedef enum _sai_tunnel_type_t
-{
-    SAI_TUNNEL_TYPE_IPINIP,
-
-    SAI_TUNNEL_TYPE_IPINIP_GRE,
-
-    SAI_TUNNEL_TYPE_VXLAN,
-
-    SAI_TUNNEL_TYPE_MPLS,
-
-    SAI_TUNNEL_TYPE_IPINIP_ESP,
-
-    SAI_TUNNEL_TYPE_IPINIP_UDP_ESP,
-
-    SAI_TUNNEL_TYPE_VXLAN_UDP_ESP,
-
-} sai_tunnel_type_t;
-
-/**
  * @brief Defines tunnel TTL mode
  */
 typedef enum _sai_tunnel_ttl_mode_t
@@ -614,11 +593,13 @@ typedef enum _sai_tunnel_attr_t
      * object).
      *
      * For IPsec hardware in the Switch ASIC, the per-tunnel port list can be
-     * derived from the union of SAI_IPSEC_SA_ATTR_IPSEC_PORT_LIST for all sai
-     *_ipsec_sa objects for that tunnel.
+     * derived from the union of SAI_IPSEC_SA_ATTR_IPSEC_PORT_LIST for all
+     * sai_ipsec_sa objects for that tunnel.
+     *
      * @type sai_object_list_t
      * @flags CREATE_AND_SET
      * @objects SAI_OBJECT_TYPE_PORT
+     * @default empty
      */
     SAI_TUNNEL_ATTR_IPSEC_SA_PORT_LIST,
 
@@ -900,7 +881,7 @@ typedef enum _sai_tunnel_term_table_entry_attr_t
      * @flags CREATE_AND_SET
      * @default true
      */
-    SAI_TUNNEL_TERM_TABLE_ENTRY_IPSEC_VERIFIED,
+    SAI_TUNNEL_TERM_TABLE_ENTRY_ATTR_IPSEC_VERIFIED,
 
     /**
      * @brief Tunnel type

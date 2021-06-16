@@ -57,23 +57,23 @@ typedef enum _sai_ipsec_cipher_t
 /**
  * @brief IPsec SA sequence number status type
  */
-typedef enum _sai_ipsec_sa_sn_status_t
+typedef enum _sai_ipsec_sa_status_t
 {
     /** SA sequence number above lower of 2 watermarks */
-    SAI_IPSEC_SA_SN_ABOVE_LOW_WATERMARK,
+    SAI_IPSEC_SA_STATUS_SN_ABOVE_LOW_WATERMARK,
 
     /** SA sequence number above higher of 2 watermarks */
-    SAI_IPSEC_SA_SN_ABOVE_HIGH_WATERMARK,
+    SAI_IPSEC_SA_STATUS_SN_ABOVE_HIGH_WATERMARK,
 
     /** SA sequence number at maximum limit */
-    SAI_IPSEC_SA_SN_AT_MAX_LIMIT,
+    SAI_IPSEC_SA_STATUS_SN_AT_MAX_LIMIT,
 
-} sai_ipsec_sa_sn_status_t;
+} sai_ipsec_sa_status_t;
 
 /**
  * @brief IPsec SA status for notification
  */
-typedef struct _sai_ipsec_sa_state_notification_t
+typedef struct _sai_ipsec_sa_status_notification_t
 {
     /**
      * @brief IPsec SA object id
@@ -82,10 +82,12 @@ typedef struct _sai_ipsec_sa_state_notification_t
      */
     sai_object_id_t ipsec_sa_id;
 
-    /** IPsec SA sequence number state  */
-    sai_ipsec_sa_sn_status_t sa_sn_state;
+    /**
+     * @brief IPsec SA status
+     */
+    sai_ipsec_sa_status_t ipsec_sa_status;
 
-} sai_ipsec_sa_state_notification_t;
+} sai_ipsec_sa_status_notification_t;
 
 /**
  * @brief Attribute Id for sai_ipsec
@@ -237,9 +239,8 @@ typedef enum _sai_ipsec_attr_t
      * @type sai_uint32_t
      * @flags CREATE_AND_SET
      * @default 0
-     * @validonly SAI_IPSEC_SA_ATTR_IPSEC_DIRECTION == SAI_IPSEC_DIRECTION_EGRESS
      */
-    SAI_IPSEC_SA_ATTR_EGRESS_32BIT_SN_HIGH_WATERMARK,
+    SAI_IPSEC_ATTR_EGRESS_32BIT_SN_HIGH_WATERMARK,
 
     /**
      * @brief Low watermark for egress 32-bit sequence number.
@@ -251,9 +252,8 @@ typedef enum _sai_ipsec_attr_t
      * @type sai_uint32_t
      * @flags CREATE_AND_SET
      * @default 0
-     * @validonly SAI_IPSEC_SA_ATTR_IPSEC_DIRECTION == SAI_IPSEC_DIRECTION_EGRESS
      */
-    SAI_IPSEC_SA_ATTR_EGRESS_32BIT_SN_LOW_WATERMARK,
+    SAI_IPSEC_ATTR_EGRESS_32BIT_SN_LOW_WATERMARK,
 
     /**
      * @brief High watermark for egress 64-bit extended sequence number.
@@ -265,9 +265,8 @@ typedef enum _sai_ipsec_attr_t
      * @type sai_uint64_t
      * @flags CREATE_AND_SET
      * @default 0
-     * @validonly SAI_IPSEC_SA_ATTR_IPSEC_DIRECTION == SAI_IPSEC_DIRECTION_EGRESS
      */
-    SAI_IPSEC_SA_ATTR_EGRESS_64BIT_ESN_HIGH_WATERMARK,
+    SAI_IPSEC_ATTR_EGRESS_64BIT_ESN_HIGH_WATERMARK,
 
     /**
      * @brief Low watermark for egress 64-bit extended sequence number.
@@ -279,9 +278,8 @@ typedef enum _sai_ipsec_attr_t
      * @type sai_uint64_t
      * @flags CREATE_AND_SET
      * @default 0
-     * @validonly SAI_IPSEC_SA_ATTR_IPSEC_DIRECTION == SAI_IPSEC_DIRECTION_EGRESS
      */
-    SAI_IPSEC_SA_ATTR_EGRESS_64BIT_ESN_LOW_WATERMARK,
+    SAI_IPSEC_ATTR_EGRESS_64BIT_ESN_LOW_WATERMARK,
 
     /**
      * @brief Global setting of read-clear or read-only for statistics read.
@@ -477,12 +475,12 @@ typedef enum _sai_ipsec_sa_attr_t
     SAI_IPSEC_SA_ATTR_IPSEC_ID,
 
     /**
-     * @brief Sequence number status.
+     * @brief SA status.
      *
-     * @type sai_ipsec_sa_sn_status_t
+     * @type sai_ipsec_sa_status_t
      * @flags READ_ONLY
      */
-    SAI_IPSEC_SA_ATTR_SN_STATUS,
+    SAI_IPSEC_SA_ATTR_STATUS,
 
     /**
      * @brief Externally assigned SA Index value for this Security Association.
@@ -1005,7 +1003,7 @@ typedef sai_status_t (*sai_clear_ipsec_sa_stats_fn)(
         _In_ const sai_stat_id_t *counter_ids);
 
 /**
- * @brief IPsec state change notification
+ * @brief IPsec SA status change notification
  *
  * Passed as a parameter into sai_initialize_switch()
  *
@@ -1014,9 +1012,9 @@ typedef sai_status_t (*sai_clear_ipsec_sa_stats_fn)(
  * @param[in] count Number of notifications
  * @param[in] data Array of notifications
  */
-typedef void (*sai_ipsec_state_change_notification_fn)(
+typedef void (*sai_ipsec_sa_status_change_notification_fn)(
         _In_ uint32_t count,
-        _In_ const sai_ipsec_sa_state_notification_t *data);
+        _In_ const sai_ipsec_sa_status_notification_t *data);
 
 /**
  * @brief IPsec methods table retrieved with sai_api_query()

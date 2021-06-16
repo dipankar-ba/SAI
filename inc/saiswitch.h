@@ -338,6 +338,12 @@ typedef enum _sai_tunnel_type_t
 
     SAI_TUNNEL_TYPE_MPLS,
 
+    SAI_TUNNEL_TYPE_IPINIP_ESP,
+
+    SAI_TUNNEL_TYPE_IPINIP_UDP_ESP,
+
+    SAI_TUNNEL_TYPE_VXLAN_UDP_ESP,
+
 } sai_tunnel_type_t;
 
 /**
@@ -1758,18 +1764,18 @@ typedef enum _sai_switch_attr_t
     SAI_SWITCH_ATTR_PORT_STATE_CHANGE_NOTIFY,
 
     /**
-     * @brief IPsec SA state change notification callback function.
+     * @brief IPsec SA status change notification callback function.
      *
      * In case driver does not support this attribute, The Host adapter should poll
-     * port status by SAI_IPSEC_SA_ATTR_SN_STATUS.
+     * port status by SAI_IPSEC_SA_ATTR_STATUS.
      *
-     * Use sai_ipsec_sa_state_notification_fn as notification function.
+     * Use sai_ipsec_sa_status_change_notification_fn as notification function.
      *
-     * @type sai_pointer_t sai_ipsec_sa_state_notification_fn
+     * @type sai_pointer_t sai_ipsec_sa_status_change_notification_fn
      * @flags CREATE_AND_SET
      * @default NULL
      */
-    SAI_SWITCH_ATTR_IPSEC_SA_STATE_NOTIFY,
+    SAI_SWITCH_ATTR_IPSEC_SA_STATUS_CHANGE_NOTIFY,
 
     /**
      * @brief Received packet event notification callback function passed to the adapter.
@@ -2377,7 +2383,7 @@ typedef enum _sai_switch_attr_t
 
     /**
      * @brief TPID in IPsec SA-Tag.  This is used only between a Switch ASIC
-     * and IPsec-enabled PHY chips and not packets on extrenal network.
+     * and IPsec-enabled PHY chips and not packets on external network.
      *
      * @type sai_uint16_t
      * @flags CREATE_AND_SET
