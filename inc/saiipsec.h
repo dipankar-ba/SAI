@@ -1016,7 +1016,7 @@ typedef sai_status_t (*sai_clear_ipsec_sa_stats_fn)(
  */
 typedef void (*sai_ipsec_state_change_notification_fn)(
         _In_ uint32_t count,
-        _In_ const sai_ipsec_state_notification_t *data);
+        _In_ const sai_ipsec_sa_state_notification_t *data);
 
 /**
  * @brief IPsec methods table retrieved with sai_api_query()
