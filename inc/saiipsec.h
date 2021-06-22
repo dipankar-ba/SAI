@@ -59,14 +59,14 @@ typedef enum _sai_ipsec_cipher_t
  */
 typedef enum _sai_ipsec_sa_status_t
 {
-    /** SA sequence number above lower of 2 watermarks */
-    SAI_IPSEC_SA_STATUS_SN_ABOVE_LOW_WATERMARK,
+    /** SA byte count above lower of 2 watermarks */
+    SAI_IPSEC_SA_STATUS_ABOVE_LOW_WATERMARK,
 
-    /** SA sequence number above higher of 2 watermarks */
-    SAI_IPSEC_SA_STATUS_SN_ABOVE_HIGH_WATERMARK,
+    /** SA byte count above higher of 2 watermarks */
+    SAI_IPSEC_SA_STATUS_ABOVE_HIGH_WATERMARK,
 
-    /** SA sequence number at maximum limit */
-    SAI_IPSEC_SA_STATUS_SN_AT_MAX_LIMIT,
+    /** SA byte count reached supported maximum value */
+    SAI_IPSEC_SA_STATUS_REACHED_MAX_LIMIT,
 
 } sai_ipsec_sa_status_t;
 
@@ -230,56 +230,30 @@ typedef enum _sai_ipsec_attr_t
     SAI_IPSEC_ATTR_MAX_VLAN_TAGS_PARSED,
 
     /**
-     * @brief High watermark for egress 32-bit sequence number.
+     * @brief High watermark for byte count.
      *
-     * The per SA sequence number status changes when the SA uses 32-bit sequence
-     * number and the next sequence number would equal this value. This watermark
-     * is used even if only 1 watermark is needed.
-     *
-     * @type sai_uint32_t
-     * @flags CREATE_AND_SET
-     * @default 0
-     */
-    SAI_IPSEC_ATTR_EGRESS_32BIT_SN_HIGH_WATERMARK,
-
-    /**
-     * @brief Low watermark for egress 32-bit sequence number.
-     *
-     * The per SA sequence number status changes when the SA uses 32-bit sequence
-     * number and the next sequence number would equal this value. This watermark
-     * is used only if 2 watermarks are needed.
-     *
-     * @type sai_uint32_t
-     * @flags CREATE_AND_SET
-     * @default 0
-     */
-    SAI_IPSEC_ATTR_EGRESS_32BIT_SN_LOW_WATERMARK,
-
-    /**
-     * @brief High watermark for egress 64-bit extended sequence number.
-     *
-     * The per SA sequence number status changes when the SA uses 64 bit ESN and
-     * the next ESN would equal this value. This watermark is used even if only 1
-     * watermarks is needed.
+     * The sai_ipsec_sa_status changes when a new packet is processed and the per
+     * SA octet count crosses this watermark. This watermark is used even if only
+     * 1 watermark is needed.
      *
      * @type sai_uint64_t
      * @flags CREATE_AND_SET
      * @default 0
      */
-    SAI_IPSEC_ATTR_EGRESS_64BIT_ESN_HIGH_WATERMARK,
+    SAI_IPSEC_ATTR_OCTET_COUNT_HIGH_WATERMARK,
 
     /**
-     * @brief Low watermark for egress 64-bit extended sequence number.
+     * @brief Low watermark for byte count
      *
-     * The per SA sequence number status changes when the SA uses 64-bit ESN and
-     * the next ESN would equal this value. This watermark is used only if 2
+     * The sai_ipsec_sa_status changes when a new packet is processed and the per
+     * SA octet count crosses this watermark. This watermark is used only if 2
      * watermarks are needed.
      *
      * @type sai_uint64_t
      * @flags CREATE_AND_SET
      * @default 0
      */
-    SAI_IPSEC_ATTR_EGRESS_64BIT_ESN_LOW_WATERMARK,
+    SAI_IPSEC_ATTR_OCTET_COUNT_LOW_WATERMARK,
 
     /**
      * @brief Global setting of read-clear or read-only for statistics read.
