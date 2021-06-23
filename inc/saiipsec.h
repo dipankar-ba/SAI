@@ -57,18 +57,18 @@ typedef enum _sai_ipsec_cipher_t
 /**
  * @brief IPsec SA sequence number status type
  */
-typedef enum _sai_ipsec_sa_status_t
+typedef enum _sai_ipsec_sa_octet_count_status_t
 {
-    /** SA byte count above lower of 2 watermarks */
-    SAI_IPSEC_SA_STATUS_ABOVE_LOW_WATERMARK,
+    /** SA byte count below lower of 2 watermarks */
+    SAI_IPSEC_SA_OCTET_COUNT_STATUS_BELOW_LOW_WATERMARK,
+
+    /** SA byte count below higher of 2 watermarks */
+    SAI_IPSEC_SA_OCTET_COUNT_STATUS_BELOW_HIGH_WATERMARK,
 
     /** SA byte count above higher of 2 watermarks */
-    SAI_IPSEC_SA_STATUS_ABOVE_HIGH_WATERMARK,
+    SAI_IPSEC_SA_OCTET_COUNT_STATUS_ABOVE_HIGH_WATERMARK,
 
-    /** SA byte count reached supported maximum value */
-    SAI_IPSEC_SA_STATUS_REACHED_MAX_LIMIT,
-
-} sai_ipsec_sa_status_t;
+} sai_ipsec_sa_octet_count_status_t;
 
 /**
  * @brief IPsec SA status for notification
@@ -83,9 +83,14 @@ typedef struct _sai_ipsec_sa_status_notification_t
     sai_object_id_t ipsec_sa_id;
 
     /**
-     * @brief IPsec SA status
+     * @brief IPsec SA byte count status
      */
-    sai_ipsec_sa_status_t ipsec_sa_status;
+    sai_ipsec_sa_octet_count_status_t ipsec_sa_octet_count_status;
+
+    /**
+     * @brief IPsec egress SA sequence number at max limit
+     */
+    bool ipsec_egress_sn_at_max_limit;
 
 } sai_ipsec_sa_status_notification_t;
 
@@ -449,12 +454,12 @@ typedef enum _sai_ipsec_sa_attr_t
     SAI_IPSEC_SA_ATTR_IPSEC_ID,
 
     /**
-     * @brief SA status.
+     * @brief SA byte count status.
      *
-     * @type sai_ipsec_sa_status_t
+     * @type sai_ipsec_sa_octet_count_status_t
      * @flags READ_ONLY
      */
-    SAI_IPSEC_SA_ATTR_STATUS,
+    SAI_IPSEC_SA_ATTR_OCTET_COUNT_STATUS,
 
     /**
      * @brief Externally assigned SA Index value for this Security Association.

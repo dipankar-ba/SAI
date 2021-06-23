@@ -1767,7 +1767,8 @@ typedef enum _sai_switch_attr_t
      * @brief IPsec SA status change notification callback function.
      *
      * In case driver does not support this attribute, The Host adapter should poll
-     * port status by SAI_IPSEC_SA_ATTR_STATUS.
+     * IPsec SA status by SAI_IPSEC_SA_ATTR_OCTET_COUNT_STATUS and
+     * SAI_IPSEC_SA_ATTR_EGRESS_ESN.
      *
      * Use sai_ipsec_sa_status_change_notification_fn as notification function.
      *
