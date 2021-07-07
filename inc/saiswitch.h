@@ -339,7 +339,7 @@ typedef enum _sai_tunnel_type_t
     SAI_TUNNEL_TYPE_MPLS,
 
     SAI_TUNNEL_TYPE_SRV6,
-    
+
     SAI_TUNNEL_TYPE_IPINIP_ESP,
 
     SAI_TUNNEL_TYPE_IPINIP_UDP_ESP,
