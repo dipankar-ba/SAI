@@ -2399,7 +2399,7 @@ typedef enum _sai_switch_attr_t
      * @type sai_uint16_t
      * @flags CREATE_AND_SET
      * @isvlan false
-     * @default 0x1234
+     * @default 65534
      */
     SAI_SWITCH_ATTR_IPSEC_SA_TAG_TPID,
 
